@@ -214,7 +214,6 @@ impl GeyserPlugin for GeyserPluginPostgres {
         slot: u64,
         is_startup: bool,
     ) -> Result<()> {
-        let mut measure_all = Measure::start("geyser-plugin-postgres-update-account-main");
         match account {
             ReplicaAccountInfoVersions::V0_0_1(_) => {
                 return Err(GeyserPluginError::Custom(Box::new(
@@ -222,8 +221,6 @@ impl GeyserPlugin for GeyserPluginPostgres {
                 )));
             }
             ReplicaAccountInfoVersions::V0_0_2(account) => {
-                let mut measure_select =
-                    Measure::start("geyser-plugin-postgres-update-account-select");
                 if let Some(accounts_selector) = &self.accounts_selector {
                     if !accounts_selector.is_account_selected(account.pubkey, account.owner) {
                         return Ok(());
@@ -231,21 +228,6 @@ impl GeyserPlugin for GeyserPluginPostgres {
                 } else {
                     return Ok(());
                 }
-                measure_select.stop();
-                inc_new_counter_debug!(
-                    "geyser-plugin-postgres-update-account-select-us",
-                    measure_select.as_us() as usize,
-                    100000,
-                    100000
-                );
-
-                debug!(
-                    "Updating account {:?} with owner {:?} at slot {:?} using account selector {:?}",
-                    bs58::encode(account.pubkey).into_string(),
-                    bs58::encode(account.owner).into_string(),
-                    slot,
-                    self.accounts_selector.as_ref().unwrap()
-                );
 
                 match &mut self.client {
                     None => {
@@ -257,18 +239,7 @@ impl GeyserPlugin for GeyserPluginPostgres {
                         )));
                     }
                     Some(client) => {
-                        let mut measure_update =
-                            Measure::start("geyser-plugin-postgres-update-account-client");
                         let result = { client.update_account(account, slot, is_startup) };
-                        measure_update.stop();
-
-                        inc_new_counter_debug!(
-                            "geyser-plugin-postgres-update-account-client-us",
-                            measure_update.as_us() as usize,
-                            100000,
-                            100000
-                        );
-
                         if let Err(err) = result {
                             return Err(GeyserPluginError::AccountsUpdateError {
                                 msg: format!("Failed to persist the update of account to the PostgreSQL database. Error: {:?}", err)
@@ -278,16 +249,6 @@ impl GeyserPlugin for GeyserPluginPostgres {
                 }
             }
         }
-
-        measure_all.stop();
-
-        inc_new_counter_debug!(
-            "geyser-plugin-postgres-update-account-main-us",
-            measure_all.as_us() as usize,
-            100000,
-            100000
-        );
-
         Ok(())
     }
 
