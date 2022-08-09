@@ -1145,22 +1145,10 @@ impl ParallelPostgresClient {
                 ("message-queue-length", self.sender.len() as i64, i64),
             );
         }
-        let mut measure = Measure::start("geyser-plugin-posgres-create-work-item");
         let wrk_item = DbWorkItem::UpdateAccount(Box::new(UpdateAccountRequest {
             account: DbAccountInfo::new(account, slot),
             is_startup,
         }));
-
-        measure.stop();
-
-        inc_new_counter_debug!(
-            "geyser-plugin-posgres-create-work-item-us",
-            measure.as_us() as usize,
-            100000,
-            100000
-        );
-
-        let mut measure = Measure::start("geyser-plugin-posgres-send-msg");
 
         if let Err(err) = self.sender.send(wrk_item) {
             return Err(GeyserPluginError::AccountsUpdateError {
@@ -1171,14 +1159,6 @@ impl ParallelPostgresClient {
                 ),
             });
         }
-
-        measure.stop();
-        inc_new_counter_debug!(
-            "geyser-plugin-posgres-send-msg-us",
-            measure.as_us() as usize,
-            100000,
-            100000
-        );
 
         Ok(())
     }
