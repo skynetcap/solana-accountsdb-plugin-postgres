@@ -1156,7 +1156,7 @@ impl ParallelPostgresClient {
 
     pub fn update_account(
         &mut self,
-        account: &ReplicaAccountInfoV2,
+        account: &ReplicaAccountInfo,
         slot: u64,
         is_startup: bool,
     ) -> Result<(), GeyserPluginError> {
