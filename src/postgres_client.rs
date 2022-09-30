@@ -19,7 +19,7 @@ use {
     postgres_client_transaction::LogTransactionRequest,
     postgres_openssl::MakeTlsConnector,
     solana_geyser_plugin_interface::geyser_plugin_interface::{
-        GeyserPluginError, ReplicaAccountInfoV2, ReplicaBlockInfo, SlotStatus,
+        GeyserPluginError, ReplicaAccountInfo, ReplicaBlockInfo, SlotStatus,
     },
     solana_measure::measure::Measure,
     solana_metrics::*,
