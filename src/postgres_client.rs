@@ -132,7 +132,6 @@ pub trait ReadableAccountInfo: Sized {
     fn rent_epoch(&self) -> i64;
     fn data(&self) -> &[u8];
     fn write_version(&self) -> i64;
-    fn txn_signature(&self) -> Option<&[u8]>;
 }
 
 impl ReadableAccountInfo for DbAccountInfo {
@@ -164,9 +163,6 @@ impl ReadableAccountInfo for DbAccountInfo {
         self.write_version
     }
 
-    fn txn_signature(&self) -> Option<&[u8]> {
-        self.txn_signature.as_deref()
-    }
 }
 
 impl<'a> ReadableAccountInfo for ReplicaAccountInfo<'a> {
