@@ -198,9 +198,6 @@ impl<'a> ReadableAccountInfo for ReplicaAccountInfo<'a> {
         self.write_version as i64
     }
 
-    fn txn_signature(&self) -> Option<&[u8]> {
-        self.txn_signature.map(|v| v.as_ref())
-    }
 }
 
 pub trait PostgresClient {
@@ -1160,10 +1157,10 @@ impl ParallelPostgresClient {
         slot: u64,
         is_startup: bool,
     ) -> Result<(), GeyserPluginError> {
-        if !is_startup && account.txn_signature.is_none() {
-            // we are not interested in accountsdb internal bookeeping updates
-            return Ok(());
-        }
+        // if !is_startup && account.txn_signature.is_none() {
+        //     // we are not interested in accountsdb internal bookeeping updates
+        //     return Ok(());
+        // }
 
         if self.last_report.should_update(30000) {
             datapoint_debug!(
