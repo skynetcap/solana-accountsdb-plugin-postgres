@@ -198,6 +198,10 @@ impl<'a> ReadableAccountInfo for ReplicaAccountInfo<'a> {
         self.write_version as i64
     }
 
+    fn txn_signature(&self) -> Option<&[u8]> {
+        None
+    }
+
 }
 
 pub trait PostgresClient {
